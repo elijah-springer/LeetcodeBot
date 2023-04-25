@@ -1,15 +1,21 @@
 import configparser
 from pathlib import Path
+from typing import Any
 
 import discord
+from discord import Intents
 
 CONFIG_PATH = Path('./bot.conf')
 REQUIRED_CONFIG_SECTIONS = ['Token', 'ClientId']
 
 
 class BotClient(discord.Client):
+    def __init__(self, *, client_id, intents: Intents, **options: Any):
+        self.client_id = client_id
+        super().__init__(intents=intents, **options)
+
     async def on_ready(self):
-        print(discord.utils.oauth_url(client_id=CLIENT_ID, permissions=discord.Permissions.all()))
+        print(discord.utils.oauth_url(client_id=self.client_id, permissions=discord.Permissions.all()))
         print(f'logged on as {self.user}')
 
     async def on_message(self, message: discord.Message):
@@ -52,5 +58,5 @@ if __name__ == '__main__':
     intents = discord.Intents.default()
     intents.message_content = True
 
-    client = BotClient(intents=intents)
+    client = BotClient(client_id=client_id, intents=intents)
     client.run(token)
